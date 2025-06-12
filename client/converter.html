@@ -3,146 +3,210 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zod to JSON Schema Converter</title>
+    <title>Zod Jayson's Schemanizer</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        'sans': ['Inter', 'sans-serif'],
+                        'pixel': ['Press Start 2P', 'monospace'],
                         'mono': ['JetBrains Mono', 'monospace']
                     },
                     colors: {
-                        'code-bg': '#1e293b',
-                        'code-border': '#334155'
+                        'neon-pink': '#FF00FF',
+                        'neon-cyan': '#00FFFF',
+                        'neon-green': '#00FF00',
+                        'neon-yellow': '#FFFF00',
+                        'neon-orange': '#FF8000',
+                        'dark-bg': '#0D001A',
+                        'dark-panel': '#1A0033',
+                        'code-bg': '#000011',
+                        'pixel-border': '#FF00FF'
                     }
                 }
             },
             darkMode: 'class'
         };
     </script>
+    <style>
+        .pixel-border {
+            border-style: solid;
+            border-width: 4px;
+            image-rendering: pixelated;
+        }
+        .pixel-shadow {
+            box-shadow: 8px 8px 0px #FF00FF;
+        }
+        .pixel-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 10px 10px 0px #FF00FF;
+        }
+        .pixel-avatar {
+            image-rendering: pixelated;
+            width: 64px;
+            height: 64px;
+        }
+    </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-900 min-h-screen transition-colors duration-200">
+<body class="bg-dark-bg dark:bg-dark-bg min-h-screen font-pixel text-neon-cyan">
     <!-- Header -->
-    <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-10">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center space-x-3">
-                    <div class="bg-blue-600 rounded-lg p-2">
-                        <i class="fas fa-code text-white text-lg"></i>
+    <header class="bg-dark-panel border-b-4 border-neon-pink sticky top-0 z-10 pixel-shadow">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center space-x-4">
+                    <!-- Zod Jayson Avatar -->
+                    <div class="pixel-avatar bg-neon-pink border-4 border-neon-cyan flex items-center justify-center">
+                        <svg viewBox="0 0 64 64" class="w-full h-full">
+                            <!-- Zod Jayson pixel art -->
+                            <!-- Hair -->
+                            <rect x="16" y="8" width="32" height="8" fill="#FF00FF"/>
+                            <rect x="12" y="16" width="40" height="4" fill="#FF00FF"/>
+                            <!-- Face -->
+                            <rect x="20" y="20" width="24" height="20" fill="#FFDDAA"/>
+                            <!-- Eyes -->
+                            <rect x="24" y="24" width="4" height="4" fill="#000"/>
+                            <rect x="36" y="24" width="4" height="4" fill="#000"/>
+                            <!-- Nose -->
+                            <rect x="30" y="28" width="4" height="4" fill="#FFBBAA"/>
+                            <!-- Mouth -->
+                            <rect x="28" y="32" width="8" height="4" fill="#FF0080"/>
+                            <!-- Body -->
+                            <rect x="24" y="40" width="16" height="16" fill="#00FFFF"/>
+                            <!-- Arms -->
+                            <rect x="16" y="44" width="8" height="8" fill="#FFDDAA"/>
+                            <rect x="40" y="44" width="8" height="8" fill="#FFDDAA"/>
+                        </svg>
                     </div>
                     <div>
-                        <h1 class="text-xl font-semibold text-slate-900 dark:text-slate-100">Zod Schema Converter</h1>
-                        <p class="text-sm text-slate-500 dark:text-slate-400">Convert between Zod code and JSON Schema</p>
+                        <h1 class="text-xl text-neon-green">ZOD JAYSON'S SCHEMANIZER</h1>
+                        <p class="text-sm text-neon-yellow">JSON → ZOD → SCHEMA CONVERTER</p>
                     </div>
                 </div>
                 
                 <!-- Theme Toggle -->
-                <button id="themeToggle" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors duration-200">
-                    <i class="fas fa-sun dark:hidden text-lg"></i>
-                    <i class="fas fa-moon hidden dark:inline text-lg"></i>
+                <button id="themeToggle" class="p-3 bg-dark-panel border-4 border-neon-cyan text-neon-cyan hover:bg-neon-cyan hover:text-dark-bg pixel-btn transition-all duration-200">
+                    <i class="fas fa-sun text-lg"></i>
                 </button>
             </div>
         </div>
     </header>
 
-    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Input Mode Selector -->
-        <div class="mb-8">
-            <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6 shadow-sm">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-lg font-medium text-slate-900 dark:text-slate-100">Input Mode</h2>
-                    <div class="text-sm text-slate-500 dark:text-slate-400">
-                        Choose your input format
-                    </div>
-                </div>
-                
-                <!-- Toggle Switch -->
-                <div class="flex items-center space-x-4">
-                    <label class="flex items-center cursor-pointer">
-                        <input type="radio" name="inputMode" value="zod" checked class="sr-only" id="zodMode">
-                        <div class="relative">
-                            <div class="w-12 h-6 bg-slate-200 dark:bg-slate-600 rounded-full shadow-inner transition-colors duration-200"></div>
-                            <div class="absolute left-1 top-1 w-4 h-4 bg-blue-600 rounded-full transition-transform duration-200 transform" id="toggleDot"></div>
-                        </div>
-                        <span class="ml-3 text-sm font-medium text-slate-700 dark:text-slate-300">Zod Code</span>
-                    </label>
-                    
-                    <div class="text-slate-400 dark:text-slate-500">
-                        <i class="fas fa-arrow-right"></i>
-                    </div>
-                    
-                    <label class="flex items-center cursor-pointer">
-                        <input type="radio" name="inputMode" value="json" class="sr-only" id="jsonMode">
-                        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">JSON Input</span>
-                    </label>
-                </div>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- Input Area -->
-            <div class="space-y-6">
-                <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
-                    <div class="bg-slate-50 dark:bg-slate-700 px-6 py-4 border-b border-slate-200 dark:border-slate-600">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Three Panel Converter -->
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
+            <!-- Panel 1: JSON Input -->
+            <div class="space-y-4">
+                <div class="bg-dark-panel border-4 border-neon-cyan pixel-shadow overflow-hidden">
+                    <div class="bg-dark-bg px-6 py-4 border-b-4 border-neon-cyan">
                         <div class="flex items-center justify-between">
-                            <h3 class="text-lg font-medium text-slate-900 dark:text-slate-100" id="inputTitle">Zod Code Input</h3>
-                            <div class="flex items-center space-x-2 text-sm text-slate-500 dark:text-slate-400">
+                            <h3 class="text-sm text-neon-green">JSON INPUT</h3>
+                            <div class="flex items-center space-x-2 text-xs text-neon-yellow">
                                 <i class="fas fa-code"></i>
-                                <span id="inputLanguage">JavaScript</span>
+                                <span>JSON</span>
                             </div>
                         </div>
                     </div>
                     
                     <div class="relative">
                         <textarea 
-                            id="codeInput" 
-                            class="w-full h-80 p-6 bg-code-bg text-slate-300 font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset transition-colors duration-200"
-                            placeholder="Enter your Zod schema code here..."
+                            id="jsonInput" 
+                            class="w-full h-80 p-6 bg-code-bg text-neon-cyan font-mono text-sm resize-none focus:outline-none focus:ring-4 focus:ring-neon-pink border-0"
+                            placeholder='{"name": "John", "age": 30}'
                         ></textarea>
                     </div>
                 </div>
 
-                <!-- Convert Button -->
+                <!-- Convert Button 1 -->
                 <button 
-                    id="convertBtn" 
-                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-4 px-6 rounded-xl transition-colors duration-200 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl"
+                    id="jsonToZodBtn" 
+                    class="w-full bg-dark-panel border-4 border-neon-pink text-neon-pink font-mono py-4 px-6 pixel-btn transition-all duration-200 flex items-center justify-center space-x-3"
                 >
-                    <i class="fas fa-sync-alt"></i>
-                    <span>Convert to JSON Schema</span>
+                    <i class="fas fa-arrow-right"></i>
+                    <span>JSON → ZOD</span>
                 </button>
 
-                <!-- Loading State -->
+                <!-- Loading State 1 -->
                 <button 
-                    id="convertBtnLoading" 
-                    class="w-full bg-blue-500 text-white font-medium py-4 px-6 rounded-xl flex items-center justify-center space-x-3 shadow-lg hidden"
+                    id="jsonToZodBtnLoading" 
+                    class="w-full bg-dark-panel border-4 border-neon-pink text-neon-pink font-mono py-4 px-6 flex items-center justify-center space-x-3 hidden"
                     disabled
                 >
                     <i class="fas fa-spinner fa-spin"></i>
-                    <span>Converting...</span>
+                    <span>CONVERTING...</span>
                 </button>
             </div>
 
-            <!-- Output Area -->
-            <div class="space-y-6">
-                <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
-                    <div class="bg-slate-50 dark:bg-slate-700 px-6 py-4 border-b border-slate-200 dark:border-slate-600">
+            <!-- Panel 2: Zod Code -->
+            <div class="space-y-4">
+                <div class="bg-dark-panel border-4 border-neon-green pixel-shadow overflow-hidden">
+                    <div class="bg-dark-bg px-6 py-4 border-b-4 border-neon-green">
                         <div class="flex items-center justify-between">
-                            <h3 class="text-lg font-medium text-slate-900 dark:text-slate-100">JSON Schema Output</h3>
+                            <h3 class="text-sm text-neon-green">ZOD SCHEMA</h3>
                             <div class="flex items-center space-x-3">
                                 <button 
-                                    id="copyBtn" 
-                                    class="px-3 py-1.5 text-sm bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-500 transition-colors duration-200 flex items-center space-x-2"
+                                    id="copyZodBtn" 
+                                    class="px-3 py-1.5 text-xs bg-dark-bg border-2 border-neon-green text-neon-green hover:bg-neon-green hover:text-dark-bg transition-colors duration-200 flex items-center space-x-2"
                                 >
                                     <i class="fas fa-copy"></i>
-                                    <span>Copy</span>
+                                    <span>COPY</span>
                                 </button>
-                                <div class="text-sm text-slate-500 dark:text-slate-400 flex items-center space-x-1">
+                                <div class="text-xs text-neon-yellow flex items-center space-x-1">
+                                    <i class="fas fa-code"></i>
+                                    <span>ZOD</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="relative">
+                        <textarea 
+                            id="zodCode" 
+                            class="w-full h-80 p-6 bg-code-bg text-neon-green font-mono text-sm resize-none focus:outline-none focus:ring-4 focus:ring-neon-green border-0"
+                            placeholder="z.object({ name: z.string(), age: z.number() })"
+                        ></textarea>
+                    </div>
+                </div>
+
+                <!-- Convert Button 2 -->
+                <button 
+                    id="zodToSchemaBtn" 
+                    class="w-full bg-dark-panel border-4 border-neon-orange text-neon-orange font-mono py-4 px-6 pixel-btn transition-all duration-200 flex items-center justify-center space-x-3"
+                >
+                    <i class="fas fa-arrow-right"></i>
+                    <span>ZOD → SCHEMA</span>
+                </button>
+
+                <!-- Loading State 2 -->
+                <button 
+                    id="zodToSchemaBtnLoading" 
+                    class="w-full bg-dark-panel border-4 border-neon-orange text-neon-orange font-mono py-4 px-6 flex items-center justify-center space-x-3 hidden"
+                    disabled
+                >
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <span>CONVERTING...</span>
+                </button>
+            </div>
+
+            <!-- Panel 3: JSON Schema Output -->
+            <div class="space-y-4">
+                <div class="bg-dark-panel border-4 border-neon-yellow pixel-shadow overflow-hidden">
+                    <div class="bg-dark-bg px-6 py-4 border-b-4 border-neon-yellow">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-sm text-neon-green">JSON SCHEMA</h3>
+                            <div class="flex items-center space-x-3">
+                                <button 
+                                    id="copySchemaBtn" 
+                                    class="px-3 py-1.5 text-xs bg-dark-bg border-2 border-neon-yellow text-neon-yellow hover:bg-neon-yellow hover:text-dark-bg transition-colors duration-200 flex items-center space-x-2"
+                                >
+                                    <i class="fas fa-copy"></i>
+                                    <span>COPY</span>
+                                </button>
+                                <div class="text-xs text-neon-yellow flex items-center space-x-1">
                                     <i class="fas fa-file-code"></i>
-                                    <span>JSON</span>
+                                    <span>SCHEMA</span>
                                 </div>
                             </div>
                         </div>
@@ -150,73 +214,109 @@
                     
                     <div class="relative">
                         <pre 
-                            id="jsonOutput" 
-                            class="w-full h-80 p-6 bg-code-bg text-slate-300 font-mono text-sm overflow-auto"
-                        >// Converted JSON Schema will appear here...</pre>
+                            id="jsonSchema" 
+                            class="w-full h-80 p-6 bg-code-bg text-neon-yellow font-mono text-sm overflow-auto border-0"
+                        >// JSON Schema will appear here...</pre>
                     </div>
                 </div>
 
-                <!-- Error Display -->
-                <div id="errorDisplay" class="hidden bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
-                    <div class="flex items-start space-x-3">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-exclamation-triangle text-red-600 dark:text-red-400 text-lg"></i>
-                        </div>
-                        <div class="flex-1">
-                            <h4 class="text-sm font-medium text-red-800 dark:text-red-300 mb-1">Conversion Error</h4>
-                            <p id="errorMessage" class="text-sm text-red-700 dark:text-red-400"></p>
-                        </div>
-                        <button id="dismissError" class="flex-shrink-0 text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                </div>
+            </div>
+        </div>
 
-                <!-- Success Display -->
-                <div id="successDisplay" class="hidden bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-xl p-4">
-                    <div class="flex items-center space-x-3">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-check-circle text-emerald-600 dark:text-emerald-400 text-lg"></i>
-                        </div>
-                        <div class="flex-1">
-                            <p class="text-sm text-emerald-700 dark:text-emerald-300">
-                                Schema converted successfully!
-                            </p>
-                        </div>
+        <!-- Status Messages -->
+        <div class="mb-8 space-y-4">
+            <!-- Error Display -->
+            <div id="errorDisplay" class="hidden bg-dark-panel border-4 border-red-500 p-4 pixel-shadow">
+                <div class="flex items-start space-x-3">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-exclamation-triangle text-red-500 text-lg"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="text-sm font-mono text-red-400 mb-1">ERROR</h4>
+                        <p id="errorMessage" class="text-sm text-red-300 font-mono"></p>
+                    </div>
+                    <button id="dismissError" class="flex-shrink-0 text-red-500 hover:text-red-300">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Success Display -->
+            <div id="successDisplay" class="hidden bg-dark-panel border-4 border-neon-green p-4 pixel-shadow">
+                <div class="flex items-center space-x-3">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-check-circle text-neon-green text-lg"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm text-neon-green font-mono">
+                            CONVERSION SUCCESSFUL!
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Documentation -->
-        <div class="mt-12 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-6">
-            <h3 class="text-lg font-medium text-slate-900 dark:text-slate-100 mb-4">How to Use</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
-                <div>
-                    <h4 class="font-medium text-slate-900 dark:text-slate-100 mb-2">Zod Code Input</h4>
-                    <p class="text-slate-600 dark:text-slate-400 mb-3">
-                        Enter your Zod schema definition using the standard Zod syntax. The converter supports:
-                    </p>
-                    <ul class="text-slate-600 dark:text-slate-400 space-y-1 text-xs">
-                        <li>• Object schemas with nested properties</li>
-                        <li>• String, number, boolean, and array types</li>
-                        <li>• Validation rules and error messages</li>
-                        <li>• Optional and required fields</li>
-                        <li>• Enum values and default values</li>
-                    </ul>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- How to Use -->
+            <div class="bg-dark-panel border-4 border-neon-cyan pixel-shadow p-6">
+                <h3 class="text-sm text-neon-green font-mono mb-4">HOW TO USE</h3>
+                <div class="space-y-6 text-xs font-mono">
+                    <div>
+                        <h4 class="text-neon-yellow mb-2">CONVERSION FLOW</h4>
+                        <div class="text-neon-cyan space-y-1">
+                            <div>1. PASTE JSON DATA → CLICK "JSON → ZOD"</div>
+                            <div>2. EDIT ZOD SCHEMA (OPTIONAL)</div>
+                            <div>3. CLICK "ZOD → SCHEMA" FOR RESULT</div>
+                            <div>4. OR START WITH ZOD CODE DIRECTLY</div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-neon-yellow mb-2">SUPPORTED TYPES</h4>
+                        <div class="text-neon-cyan space-y-1">
+                            <div>• OBJECTS WITH NESTED PROPERTIES</div>
+                            <div>• STRING, NUMBER, BOOLEAN, ARRAYS</div>
+                            <div>• VALIDATION RULES & CONSTRAINTS</div>
+                            <div>• OPTIONAL AND REQUIRED FIELDS</div>
+                            <div>• ENUM VALUES & DEFAULT VALUES</div>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <h4 class="font-medium text-slate-900 dark:text-slate-100 mb-2">JSON Schema Output</h4>
-                    <p class="text-slate-600 dark:text-slate-400 mb-3">
-                        The generated JSON Schema follows the latest specification and includes:
-                    </p>
-                    <ul class="text-slate-600 dark:text-slate-400 space-y-1 text-xs">
-                        <li>• Type definitions and property constraints</li>
-                        <li>• Validation rules and custom error messages</li>
-                        <li>• Required field specifications</li>
-                        <li>• Format validations (email, URL, etc.)</li>
-                        <li>• Default values and enum constraints</li>
-                    </ul>
+            </div>
+
+            <!-- API Reference -->
+            <div class="bg-dark-panel border-4 border-neon-orange pixel-shadow p-6">
+                <h3 class="text-sm text-neon-green font-mono mb-4">API REFERENCE</h3>
+                <div class="space-y-4 text-xs font-mono">
+                    <div>
+                        <h4 class="text-neon-yellow mb-2">ENDPOINT</h4>
+                        <div class="bg-code-bg border-2 border-neon-orange p-3 text-neon-orange">
+                            POST /api/convert
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-neon-yellow mb-2">REQUEST BODY</h4>
+                        <div class="bg-code-bg border-2 border-neon-orange p-3 text-neon-orange">
+                            {<br/>
+                            &nbsp;&nbsp;"code": "z.string()",<br/>
+                            &nbsp;&nbsp;"mode": "zod"<br/>
+                            }
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-neon-yellow mb-2">MODES</h4>
+                        <div class="text-neon-cyan space-y-1">
+                            <div>• "zod" - ZOD TO JSON SCHEMA</div>
+                            <div>• "json" - JSON TO ZOD SCHEMA</div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-neon-yellow mb-2">RESPONSE</h4>
+                        <div class="bg-code-bg border-2 border-neon-orange p-3 text-neon-orange">
+                            {"schema": {...}} OR<br/>
+                            {"zodCode": "z.object({...})"}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -224,79 +324,62 @@
 
     <script>
         (function() {
-            // Theme management
+            // Theme management (simplified since we're using pixel theme)
             const themeToggle = document.getElementById('themeToggle');
-            const html = document.documentElement;
             
-            // Initialize theme from localStorage or default to light
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            if (savedTheme === 'dark') {
-                html.classList.add('dark');
-            }
-
-            themeToggle.addEventListener('click', () => {
-                html.classList.toggle('dark');
-                const isDark = html.classList.contains('dark');
-                localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            });
-
-            // Input mode management
-            const zodMode = document.getElementById('zodMode');
-            const jsonMode = document.getElementById('jsonMode');
-            const toggleDot = document.getElementById('toggleDot');
-            const inputTitle = document.getElementById('inputTitle');
-            const inputLanguage = document.getElementById('inputLanguage');
-            const codeInput = document.getElementById('codeInput');
-            const convertBtn = document.getElementById('convertBtn');
-
-            function updateInputMode(mode) {
-                if (mode === 'zod') {
-                    toggleDot.style.transform = 'translateX(0)';
-                    inputTitle.textContent = 'Zod Code Input';
-                    inputLanguage.textContent = 'JavaScript';
-                    codeInput.placeholder = 'Enter your Zod schema code here...';
-                    convertBtn.innerHTML = '<i class="fas fa-sync-alt"></i><span>Convert to JSON Schema</span>';
-                } else {
-                    toggleDot.style.transform = 'translateX(24px)';
-                    inputTitle.textContent = 'JSON Input';
-                    inputLanguage.textContent = 'JSON';
-                    codeInput.placeholder = 'Enter your JSON data here...';
-                    convertBtn.innerHTML = '<i class="fas fa-sync-alt"></i><span>Generate Zod Schema</span>';
-                }
-            }
-
-            zodMode.addEventListener('change', () => {
-                if (zodMode.checked) updateInputMode('zod');
-            });
-
-            jsonMode.addEventListener('change', () => {
-                if (jsonMode.checked) updateInputMode('json');
-            });
-
-            // Convert button functionality
-            const convertBtnLoading = document.getElementById('convertBtnLoading');
+            // Get DOM elements for three-panel converter
+            const jsonInput = document.getElementById('jsonInput');
+            const zodCode = document.getElementById('zodCode');
+            const jsonSchema = document.getElementById('jsonSchema');
+            
+            const jsonToZodBtn = document.getElementById('jsonToZodBtn');
+            const jsonToZodBtnLoading = document.getElementById('jsonToZodBtnLoading');
+            const zodToSchemaBtn = document.getElementById('zodToSchemaBtn');
+            const zodToSchemaBtnLoading = document.getElementById('zodToSchemaBtnLoading');
+            
+            const copyZodBtn = document.getElementById('copyZodBtn');
+            const copySchemaBtn = document.getElementById('copySchemaBtn');
+            
             const errorDisplay = document.getElementById('errorDisplay');
             const successDisplay = document.getElementById('successDisplay');
             const errorMessage = document.getElementById('errorMessage');
-            const jsonOutput = document.getElementById('jsonOutput');
+            const dismissError = document.getElementById('dismissError');
 
-            convertBtn.addEventListener('click', async () => {
-                // Hide previous messages
+            // Helper function to show/hide loading states
+            function setLoadingState(button, loadingButton, isLoading) {
+                if (isLoading) {
+                    button.classList.add('hidden');
+                    loadingButton.classList.remove('hidden');
+                } else {
+                    button.classList.remove('hidden');
+                    loadingButton.classList.add('hidden');
+                }
+            }
+
+            // Helper function to show messages
+            function showMessage(type, message) {
                 errorDisplay.classList.add('hidden');
                 successDisplay.classList.add('hidden');
+                
+                if (type === 'error') {
+                    errorMessage.textContent = message;
+                    errorDisplay.classList.remove('hidden');
+                } else if (type === 'success') {
+                    successDisplay.classList.remove('hidden');
+                }
+            }
 
-                // Show loading state
-                convertBtn.classList.add('hidden');
-                convertBtnLoading.classList.remove('hidden');
+            // JSON to Zod conversion
+            jsonToZodBtn.addEventListener('click', async () => {
+                showMessage('clear');
+                setLoadingState(jsonToZodBtn, jsonToZodBtnLoading, true);
 
                 try {
-                    const inputCode = codeInput.value.trim();
+                    const inputCode = jsonInput.value.trim();
                     if (!inputCode) {
-                        throw new Error('Please enter some code to convert');
+                        throw new Error('Please enter JSON data to convert');
                     }
 
-                    const mode = zodMode.checked ? 'zod' : 'json';
-                    
                     const response = await fetch('/api/convert', {
                         method: 'POST',
                         headers: {
@@ -304,49 +387,92 @@
                         },
                         body: JSON.stringify({
                             code: inputCode,
-                            mode: mode
+                            mode: 'json'
                         })
                     });
 
                     if (!response.ok) {
                         const errorData = await response.json();
-                        throw new Error(errorData.message || 'Conversion failed');
+                        throw new Error(errorData.message || 'JSON to Zod conversion failed');
                     }
 
                     const result = await response.json();
-                    
-                    // Show success message
-                    successDisplay.classList.remove('hidden');
-                    
-                    // Display the result
-                    if (mode === 'zod') {
-                        jsonOutput.textContent = JSON.stringify(result.schema, null, 2);
-                    } else {
-                        jsonOutput.textContent = result.zodCode;
-                    }
+                    zodCode.value = result.zodCode;
+                    showMessage('success');
 
                 } catch (error) {
-                    errorMessage.textContent = error.message;
-                    errorDisplay.classList.remove('hidden');
+                    showMessage('error', error.message);
                 } finally {
-                    // Hide loading state
-                    convertBtnLoading.classList.add('hidden');
-                    convertBtn.classList.remove('hidden');
+                    setLoadingState(jsonToZodBtn, jsonToZodBtnLoading, false);
                 }
             });
 
-            // Copy functionality
-            const copyBtn = document.getElementById('copyBtn');
-            copyBtn.addEventListener('click', async () => {
+            // Zod to Schema conversion
+            zodToSchemaBtn.addEventListener('click', async () => {
+                showMessage('clear');
+                setLoadingState(zodToSchemaBtn, zodToSchemaBtnLoading, true);
+
                 try {
-                    await navigator.clipboard.writeText(jsonOutput.textContent);
-                    const originalText = copyBtn.innerHTML;
-                    copyBtn.innerHTML = '<i class="fas fa-check"></i><span>Copied!</span>';
-                    copyBtn.classList.add('bg-emerald-100', 'dark:bg-emerald-600', 'text-emerald-700', 'dark:text-emerald-100');
+                    const inputCode = zodCode.value.trim();
+                    if (!inputCode) {
+                        throw new Error('Please enter Zod schema code to convert');
+                    }
+
+                    const response = await fetch('/api/convert', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            code: inputCode,
+                            mode: 'zod'
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Zod to Schema conversion failed');
+                    }
+
+                    const result = await response.json();
+                    jsonSchema.textContent = JSON.stringify(result.schema, null, 2);
+                    showMessage('success');
+
+                } catch (error) {
+                    showMessage('error', error.message);
+                } finally {
+                    setLoadingState(zodToSchemaBtn, zodToSchemaBtnLoading, false);
+                }
+            });
+
+            // Copy functionality for Zod code
+            copyZodBtn.addEventListener('click', async () => {
+                try {
+                    await navigator.clipboard.writeText(zodCode.value);
+                    const originalText = copyZodBtn.innerHTML;
+                    copyZodBtn.innerHTML = '<i class="fas fa-check"></i><span>COPIED!</span>';
+                    copyZodBtn.classList.add('bg-neon-green', 'text-dark-bg');
                     
                     setTimeout(() => {
-                        copyBtn.innerHTML = originalText;
-                        copyBtn.classList.remove('bg-emerald-100', 'dark:bg-emerald-600', 'text-emerald-700', 'dark:text-emerald-100');
+                        copyZodBtn.innerHTML = originalText;
+                        copyZodBtn.classList.remove('bg-neon-green', 'text-dark-bg');
+                    }, 2000);
+                } catch (err) {
+                    console.error('Failed to copy: ', err);
+                }
+            });
+
+            // Copy functionality for JSON Schema
+            copySchemaBtn.addEventListener('click', async () => {
+                try {
+                    await navigator.clipboard.writeText(jsonSchema.textContent);
+                    const originalText = copySchemaBtn.innerHTML;
+                    copySchemaBtn.innerHTML = '<i class="fas fa-check"></i><span>COPIED!</span>';
+                    copySchemaBtn.classList.add('bg-neon-yellow', 'text-dark-bg');
+                    
+                    setTimeout(() => {
+                        copySchemaBtn.innerHTML = originalText;
+                        copySchemaBtn.classList.remove('bg-neon-yellow', 'text-dark-bg');
                     }, 2000);
                 } catch (err) {
                     console.error('Failed to copy: ', err);
@@ -354,13 +480,9 @@
             });
 
             // Error dismissal
-            const dismissError = document.getElementById('dismissError');
             dismissError.addEventListener('click', () => {
                 errorDisplay.classList.add('hidden');
             });
-
-            // Initialize UI state
-            updateInputMode('zod');
         })();
     </script>
 </body>
