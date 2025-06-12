@@ -6,8 +6,7 @@ import path from "path";
 // Import zodToJsonSchema from zod-to-json-schema if available
 // Note: This is a common utility for converting Zod schemas to JSON Schema
 function zodToJsonSchema(zodSchema: any): any {
-  // This is a simplified conversion function
-  // In a real implementation, you would use a proper library like zod-to-json-schema
+  // Enhanced conversion function with full JSON Schema support
   
   if (!zodSchema || typeof zodSchema !== 'object') {
     throw new Error('Invalid Zod schema');
@@ -17,40 +16,69 @@ function zodToJsonSchema(zodSchema: any): any {
   const convertSchema = (schema: any): any => {
     if (schema._def) {
       const def = schema._def;
+      let jsonSchema: any = {};
+      
+      // Add description from .describe() if available
+      if (def.description) {
+        jsonSchema.description = def.description;
+      }
       
       switch (def.typeName) {
         case 'ZodString':
-          const stringSchema: any = { type: 'string' };
+          jsonSchema.type = 'string';
           if (def.checks) {
             for (const check of def.checks) {
-              if (check.kind === 'min') stringSchema.minLength = check.value;
-              if (check.kind === 'max') stringSchema.maxLength = check.value;
-              if (check.kind === 'email') stringSchema.format = 'email';
-              if (check.kind === 'url') stringSchema.format = 'uri';
+              if (check.kind === 'min') jsonSchema.minLength = check.value;
+              if (check.kind === 'max') jsonSchema.maxLength = check.value;
+              if (check.kind === 'email') jsonSchema.format = 'email';
+              if (check.kind === 'url') jsonSchema.format = 'uri';
+              if (check.kind === 'uuid') jsonSchema.format = 'uuid';
+              if (check.kind === 'datetime') jsonSchema.format = 'date-time';
+              if (check.kind === 'regex') jsonSchema.pattern = check.regex.source;
             }
           }
-          return stringSchema;
+          return jsonSchema;
           
         case 'ZodNumber':
-          const numberSchema: any = { type: 'number' };
+          jsonSchema.type = 'number';
           if (def.checks) {
             for (const check of def.checks) {
-              if (check.kind === 'min') numberSchema.minimum = check.value;
-              if (check.kind === 'max') numberSchema.maximum = check.value;
+              if (check.kind === 'min') {
+                jsonSchema.minimum = check.value;
+                if (!check.inclusive) jsonSchema.exclusiveMinimum = true;
+              }
+              if (check.kind === 'max') {
+                jsonSchema.maximum = check.value;
+                if (!check.inclusive) jsonSchema.exclusiveMaximum = true;
+              }
+              if (check.kind === 'int') jsonSchema.type = 'integer';
+              if (check.kind === 'multipleOf') jsonSchema.multipleOf = check.value;
             }
           }
-          return numberSchema;
+          return jsonSchema;
           
         case 'ZodBoolean':
-          return { type: 'boolean' };
+          jsonSchema.type = 'boolean';
+          return jsonSchema;
+          
+        case 'ZodDate':
+          jsonSchema.type = 'string';
+          jsonSchema.format = 'date-time';
+          return jsonSchema;
           
         case 'ZodArray':
-          return {
-            type: 'array',
-            items: convertSchema(def.type)
-          };
+          jsonSchema.type = 'array';
+          jsonSchema.items = convertSchema(def.type);
+          if (def.minLength !== null) jsonSchema.minItems = def.minLength.value;
+          if (def.maxLength !== null) jsonSchema.maxItems = def.maxLength.value;
+          if (def.exactLength !== null) {
+            jsonSchema.minItems = def.exactLength.value;
+            jsonSchema.maxItems = def.exactLength.value;
+          }
+          return jsonSchema;
           
         case 'ZodObject':
+          jsonSchema.type = 'object';
           const properties: any = {};
           const required: string[] = [];
           
@@ -62,25 +90,62 @@ function zodToJsonSchema(zodSchema: any): any {
             }
           }
           
-          const objectSchema: any = {
-            type: 'object',
-            properties
-          };
-          
+          jsonSchema.properties = properties;
           if (required.length > 0) {
-            objectSchema.required = required;
+            jsonSchema.required = required;
           }
           
-          return objectSchema;
+          // Add additionalProperties control
+          if (def.unknownKeys === 'passthrough') {
+            jsonSchema.additionalProperties = true;
+          } else if (def.unknownKeys === 'strict') {
+            jsonSchema.additionalProperties = false;
+          }
+          
+          return jsonSchema;
           
         case 'ZodOptional':
           return convertSchema(def.innerType);
           
+        case 'ZodNullable':
+          const nullableSchema = convertSchema(def.innerType);
+          if (nullableSchema.type) {
+            nullableSchema.type = [nullableSchema.type, 'null'];
+          }
+          return nullableSchema;
+          
         case 'ZodEnum':
-          return {
-            type: 'string',
-            enum: def.values
-          };
+          jsonSchema.type = 'string';
+          jsonSchema.enum = def.values;
+          return jsonSchema;
+          
+        case 'ZodLiteral':
+          jsonSchema.const = def.value;
+          return jsonSchema;
+          
+        case 'ZodUnion':
+          jsonSchema.anyOf = def.options.map((option: any) => convertSchema(option));
+          return jsonSchema;
+          
+        case 'ZodIntersection':
+          jsonSchema.allOf = [convertSchema(def.left), convertSchema(def.right)];
+          return jsonSchema;
+          
+        case 'ZodRecord':
+          jsonSchema.type = 'object';
+          if (def.valueType) {
+            jsonSchema.additionalProperties = convertSchema(def.valueType);
+          } else {
+            jsonSchema.additionalProperties = true;
+          }
+          return jsonSchema;
+          
+        case 'ZodTuple':
+          jsonSchema.type = 'array';
+          jsonSchema.items = def.items.map((item: any) => convertSchema(item));
+          jsonSchema.minItems = def.items.length;
+          jsonSchema.maxItems = def.items.length;
+          return jsonSchema;
           
         default:
           return { type: 'any' };
@@ -90,7 +155,16 @@ function zodToJsonSchema(zodSchema: any): any {
     return { type: 'any' };
   };
 
-  return convertSchema(zodSchema);
+  const schema = convertSchema(zodSchema);
+  
+  // Add JSON Schema metadata at root level
+  const rootSchema = {
+    $schema: 'https://json-schema.org/draft/2020-12/schema',
+    type: schema.type || 'object',
+    ...schema
+  };
+
+  return rootSchema;
 }
 
 function jsonToZodSchema(jsonData: any): string {
