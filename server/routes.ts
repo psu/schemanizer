@@ -144,9 +144,15 @@ function zodToJsonSchema(zodSchema: any): any {
         case 'ZodArray':
           jsonSchema.type = 'array';
           jsonSchema.items = convertSchema(def.type);
-          if (def.minLength !== undefined) jsonSchema.minItems = def.minLength.value;
-          if (def.maxLength !== undefined) jsonSchema.maxItems = def.maxLength.value;
-          if (def.exactLength !== undefined) {
+          
+          // Fix: Check if minLength/maxLength/exactLength exist and have value property
+          if (def.minLength && def.minLength.value !== undefined) {
+            jsonSchema.minItems = def.minLength.value;
+          }
+          if (def.maxLength && def.maxLength.value !== undefined) {
+            jsonSchema.maxItems = def.maxLength.value;
+          }
+          if (def.exactLength && def.exactLength.value !== undefined) {
             jsonSchema.minItems = def.exactLength.value;
             jsonSchema.maxItems = def.exactLength.value;
           }
@@ -157,7 +163,10 @@ function zodToJsonSchema(zodSchema: any): any {
           }
           
           // Add $comment for array constraints
-          if (def.minLength || def.maxLength || def.exactLength) {
+          const hasConstraints = (def.minLength && def.minLength.value !== undefined) || 
+                                (def.maxLength && def.maxLength.value !== undefined) || 
+                                (def.exactLength && def.exactLength.value !== undefined);
+          if (hasConstraints) {
             jsonSchema.$comment = 'Array length constraints applied from Zod schema';
           }
           
