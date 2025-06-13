@@ -145,16 +145,17 @@ function zodToJsonSchema(zodSchema: any): any {
           jsonSchema.type = 'array';
           jsonSchema.items = convertSchema(def.type);
           
-          // Fix: Check if minLength/maxLength/exactLength exist and have value property
-          if (def.minLength && def.minLength.value !== undefined) {
-            jsonSchema.minItems = def.minLength.value;
-          }
-          if (def.maxLength && def.maxLength.value !== undefined) {
-            jsonSchema.maxItems = def.maxLength.value;
-          }
-          if (def.exactLength && def.exactLength.value !== undefined) {
-            jsonSchema.minItems = def.exactLength.value;
-            jsonSchema.maxItems = def.exactLength.value;
+          // Fix: Safely handle array constraints - they may not exist for basic arrays
+          // Check for length constraints in checks array if it exists
+          if (def.checks && Array.isArray(def.checks)) {
+            for (const check of def.checks) {
+              if (check.kind === 'min') jsonSchema.minItems = check.value;
+              if (check.kind === 'max') jsonSchema.maxItems = check.value;
+              if (check.kind === 'length') {
+                jsonSchema.minItems = check.value;
+                jsonSchema.maxItems = check.value;
+              }
+            }
           }
           
           // Add default value if available
@@ -162,13 +163,8 @@ function zodToJsonSchema(zodSchema: any): any {
             jsonSchema.default = def.defaultValue();
           }
           
-          // Add $comment for array constraints
-          const hasConstraints = (def.minLength && def.minLength.value !== undefined) || 
-                                (def.maxLength && def.maxLength.value !== undefined) || 
-                                (def.exactLength && def.exactLength.value !== undefined);
-          if (hasConstraints) {
-            jsonSchema.$comment = 'Array length constraints applied from Zod schema';
-          }
+          // Add $comment for array type
+          jsonSchema.$comment = 'Array type from Zod schema';
           
           return jsonSchema;
           
