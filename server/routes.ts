@@ -21,25 +21,7 @@ function zodToJsonSchema(zodSchema: any): any {
     return name.charAt(0).toUpperCase() + name.slice(1).replace(/([A-Z])/g, ' $1').trim();
   };
 
-  // Helper function to generate examples based on type
-  const generateExamples = (type: string, format?: string): any[] => {
-    switch (type) {
-      case 'string':
-        if (format === 'email') return ['user@example.com', 'admin@company.org'];
-        if (format === 'uri') return ['https://example.com', 'https://api.service.com'];
-        if (format === 'uuid') return ['123e4567-e89b-12d3-a456-426614174000'];
-        if (format === 'date-time') return ['2023-12-25T10:30:00Z', '2024-01-01T00:00:00Z'];
-        return ['example', 'sample text'];
-      case 'integer':
-        return [1, 42, 100];
-      case 'number':
-        return [1.5, 3.14, 42.0];
-      case 'boolean':
-        return [true, false];
-      default:
-        return [];
-    }
-  };
+  // Example generation removed as requested
 
   // Basic conversion logic for common Zod types
   const convertSchema = (schema: any, propName?: string): any => {
@@ -83,10 +65,7 @@ function zodToJsonSchema(zodSchema: any): any {
             jsonSchema.default = def.defaultValue();
           }
           
-          // Generate examples based on format
-          if (!jsonSchema.examples) {
-            jsonSchema.examples = generateExamples('string', jsonSchema.format);
-          }
+          // Examples removed as requested
           
           return jsonSchema;
           
@@ -112,9 +91,7 @@ function zodToJsonSchema(zodSchema: any): any {
             jsonSchema.default = def.defaultValue();
           }
           
-          // Generate examples
-          const numberType = jsonSchema.type === 'integer' ? 'integer' : 'number';
-          jsonSchema.examples = generateExamples(numberType);
+          // Examples removed as requested
           
           return jsonSchema;
           
@@ -126,7 +103,7 @@ function zodToJsonSchema(zodSchema: any): any {
             jsonSchema.default = def.defaultValue();
           }
           
-          jsonSchema.examples = generateExamples('boolean');
+          // Examples removed as requested
           return jsonSchema;
           
         case 'ZodDate':
@@ -138,7 +115,7 @@ function zodToJsonSchema(zodSchema: any): any {
             jsonSchema.default = def.defaultValue().toISOString();
           }
           
-          jsonSchema.examples = generateExamples('string', 'date-time');
+          // Examples removed as requested
           return jsonSchema;
           
         case 'ZodArray':
@@ -162,9 +139,6 @@ function zodToJsonSchema(zodSchema: any): any {
           if (def.defaultValue !== undefined) {
             jsonSchema.default = def.defaultValue();
           }
-          
-          // Add $comment for array type
-          jsonSchema.$comment = 'Array type from Zod schema';
           
           return jsonSchema;
           
@@ -198,11 +172,6 @@ function zodToJsonSchema(zodSchema: any): any {
             jsonSchema.default = def.defaultValue();
           }
           
-          // Add $comment for object constraints
-          if (def.unknownKeys) {
-            jsonSchema.$comment = `Object with ${def.unknownKeys} unknown keys policy`;
-          }
-          
           return jsonSchema;
           
         case 'ZodOptional':
@@ -215,13 +184,12 @@ function zodToJsonSchema(zodSchema: any): any {
           if (nullableSchema.type) {
             nullableSchema.type = [nullableSchema.type, 'null'];
           }
-          nullableSchema.$comment = 'Nullable field from Zod schema';
           return nullableSchema;
           
         case 'ZodEnum':
           jsonSchema.type = 'string';
           jsonSchema.enum = def.values;
-          jsonSchema.examples = def.values.slice(0, 2); // First two enum values as examples
+          // Examples removed as requested
           if (def.defaultValue !== undefined) {
             jsonSchema.default = def.defaultValue();
           }
@@ -229,17 +197,15 @@ function zodToJsonSchema(zodSchema: any): any {
           
         case 'ZodLiteral':
           jsonSchema.const = def.value;
-          jsonSchema.examples = [def.value];
+          // Examples removed as requested
           return jsonSchema;
           
         case 'ZodUnion':
           jsonSchema.anyOf = def.options.map((option: any) => convertSchema(option, propName));
-          jsonSchema.$comment = 'Union type from Zod schema';
           return jsonSchema;
           
         case 'ZodIntersection':
           jsonSchema.allOf = [convertSchema(def.left, propName), convertSchema(def.right, propName)];
-          jsonSchema.$comment = 'Intersection type from Zod schema';
           return jsonSchema;
           
         case 'ZodRecord':
@@ -249,7 +215,6 @@ function zodToJsonSchema(zodSchema: any): any {
           } else {
             jsonSchema.additionalProperties = true;
           }
-          jsonSchema.$comment = 'Record type with dynamic keys';
           return jsonSchema;
           
         case 'ZodTuple':
@@ -257,7 +222,6 @@ function zodToJsonSchema(zodSchema: any): any {
           jsonSchema.items = def.items.map((item: any) => convertSchema(item));
           jsonSchema.minItems = def.items.length;
           jsonSchema.maxItems = def.items.length;
-          jsonSchema.$comment = 'Fixed-length tuple from Zod schema';
           return jsonSchema;
           
         default:
@@ -287,10 +251,7 @@ function zodToJsonSchema(zodSchema: any): any {
     rootSchema.title = 'Generated Schema';
   }
 
-  // Add root-level $comment
-  if (!rootSchema.$comment) {
-    rootSchema.$comment = 'Generated from Zod schema using Zod Jayson\'s Schemanizer';
-  }
+  // $comment removed as requested
 
   return rootSchema;
 }
