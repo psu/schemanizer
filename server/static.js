@@ -1,5 +1,4 @@
 import express from 'express'
-import fs from 'fs'
 import path from 'path'
 
 export function log(message, source = 'express') {
@@ -14,7 +13,7 @@ export function log(message, source = 'express') {
 }
 
 export function serveStatic(app) {
-  const clientPath = path.resolve(import.meta.dirname, '..', 'client')
+  const clientPath = path.resolve(import.meta.dirname, '..')
 
   // Serve static files from client directory
   app.use(express.static(clientPath))
