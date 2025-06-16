@@ -40,6 +40,9 @@
       .pixel-shadow {
         box-shadow: 8px 8px 0px #ff00ff;
       }
+      .pixel-shadow-gray {
+        box-shadow: 8px 8px 0px #aaa;
+      }
       .pixel-btn:hover {
         transform: translate(-2px, -2px);
         box-shadow: 10px 10px 0px #ff00ff;
@@ -53,17 +56,18 @@
   </head>
   <body class="bg-dark-bg dark:bg-dark-bg min-h-screen font-pixel text-neon-cyan">
     <!-- Header -->
-    <header class="bg-dark-panel border-b-4 border-neon-pink sticky top-0 z-10 pixel-shadow">
+    <header class="bg-dark-panel border-b-4 border-neon-pink sticky top-0 z-10 pixel-shadow pixel-shadow">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-20">
-          <div class="flex items-center space-x-4">
+          <div class="flex items-center space-x-3 sm:space-x-4">
             <!-- Zød Jayson Avatar -->
             <div class="pixel-avatar bg-gray-900 border-4 border-neon-cyan flex items-center justify-center">
               <svg viewBox="0 0 64 64" class="w-full h-full">
                 <!-- Zød Jayson pixel art -->
-                <!-- Hair -->
-                <rect x="16" y="8" width="32" height="8" fill="#FF00FF" />
-                <rect x="12" y="16" width="40" height="4" fill="#FF00FF" />
+                <!-- Cap -->
+                <rect x="20" y="8" width="20" height="4" fill="#FF00FF" />
+                <rect x="16" y="12" width="28" height="4" fill="#FF00FF" />
+                <rect x="16" y="16" width="40" height="4" fill="#FF00FF" />
                 <!-- Face -->
                 <rect x="20" y="20" width="24" height="20" fill="#FFDDAA" />
                 <!-- Eyes -->
@@ -81,18 +85,17 @@
               </svg>
             </div>
             <div>
-              <h1 class="lg:text-2xl text-lg text-neon-green font-mono">Zød Jayson's Schemanizer</h1>
-              <p class="text-sm sm:text-xs text-neon-yellow">Convert &nbsp;JSON → Zod → JSON Schema</p>
+              <h1 class="text-md lg:text-2xl sm:text-lg text-neon-green font-mono">Zød Jayson's Schemanizer</h1>
+              <p class="text-xs sm:text-sm text-neon-yellow">Convert &nbsp;JSON → Zod → JSON Schema</p>
             </div>
           </div>
           <!-- Grayscale Toggle -->
           <button
             id="grayscaleToggle"
-            class="px-3 py-1.5 text-xs bg-dark-bg border-2 border-gray-500 text-gray-500 hover:border-white hover:bg-black hover:text-white transition-colors duration-200 flex items-center space-x-2"
-            style="filter: grayscale(0%) !important; filter: brightness(100%) !important"
+            class="px-3 py-1.5 text-xs border-2 border-gray-500 text-gray-400 transition-colors duration-100 flex items-center space-x-2"
           >
             <i class="fas fa-adjust"></i>
-            <span>Grayscale</span>
+            <span class="max-sm:hidden">Gray</span>
           </button>
         </div>
       </div>
@@ -513,17 +516,36 @@
         // Grayscale toggle functionality
         const grayscaleToggle = document.getElementById('grayscaleToggle')
         grayscaleToggle.addEventListener('click', () => {
-          document.body.classList.toggle('grayscale')
-          document.body.classList.toggle('brightness-65')
-          document.body.classList.toggle('bg-black')
+          
+          const main = document.getElementsByTagName('main')[0] 
+          const footer = document.getElementsByTagName('footer')[0]
+          const header = document.getElementsByTagName('header')[0]
+          const almost_header = Array.from(document.querySelectorAll('header div div > *:not(#grayscaleToggle)'))
+
+          ;[main, footer, ...almost_header].forEach(el => {
+            el.classList.toggle('grayscale')
+            el.classList.toggle('brightness-65')
+          })
 
           // Update button text
           const toggleText = grayscaleToggle.querySelector('span')
-          if (document.body.classList.contains('grayscale')) {
-            toggleText.textContent = 'Color Mode'
+          
+          if (main.classList.contains('grayscale')) {
+document.body.classList.toggle('bg-black')
+            header.classList.add('pixel-shadow-gray', 'bg-black')
+            header.classList.remove('border-neon-pink')
+            toggleText.textContent = 'Neon'
+            grayscaleToggle.classList.add('text-neon-cyan')
+            grayscaleToggle.classList.add('border-neon-cyan')
           } else {
-            toggleText.textContent = 'Toggle Grayscale'
+document.body.classList.toggle('bg-black')
+            header.classList.remove('pixel-shadow-gray', 'bg-black')
+            header.classList.add('border-neon-pink')
+            toggleText.textContent = 'Gray'
+            grayscaleToggle.classList.remove('text-neon-cyan')
+            grayscaleToggle.classList.remove('border-neon-cyan')
           }
+
         })
       })()
     </script>
