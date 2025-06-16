@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Zød Jayson's Schemanizer - Zod JSON Schema Javascript Converter</title>
+    <title>Zød Jayson's Schemanizer - Convert JSON to Zod to JSON Schema for Javascript/Typescript Type Definitions</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
@@ -49,8 +49,6 @@
         width: 64px;
         height: 64px;
       }
-      .grayscale {
-      }
     </style>
   </head>
   <body class="bg-dark-bg dark:bg-dark-bg min-h-screen font-pixel text-neon-cyan">
@@ -83,14 +81,15 @@
               </svg>
             </div>
             <div>
-              <h1 class="text-xl text-neon-green">Zød Jayson's Schemanizer</h1>
-              <p class="text-sm text-neon-yellow">JSON → Zod → JSON Schema &nbsp;<em>Converter</em></p>
+              <h1 class="text-2xl text-neon-green font-mono">Zød Jayson's Schemanizer</h1>
+              <p class="text-sm text-neon-yellow">Convert &nbsp;JSON → Zod → JSON Schema</p>
             </div>
           </div>
           <!-- Grayscale Toggle -->
           <button
             id="grayscaleToggle"
-            class="px-3 py-1.5 text-xs bg-dark-bg border-2 border-neon-cyan text-neon-cyan hover:bg-neon-cyan hover:text-dark-bg transition-colors duration-200 flex items-center space-x-2"
+            class="px-3 py-1.5 text-xs bg-dark-bg border-2 border-gray-500 text-gray-500 hover:border-white hover:bg-black hover:text-white transition-colors duration-200 flex items-center space-x-2"
+            style="filter: grayscale(0%) !important; filter: brightness(100%) !important"
           >
             <i class="fas fa-adjust"></i>
             <span>Toggle Grayscale</span>
@@ -107,11 +106,18 @@
           <div class="bg-dark-panel border-4 border-neon-cyan pixel-shadow overflow-hidden">
             <div class="bg-dark-bg px-6 py-4 border-b-4 border-neon-cyan">
               <div class="flex items-center justify-between">
-                <h3 class="text-sm text-neon-green">JSON input</h3>
-                <div class="flex items-center space-x-2 text-xs text-neon-yellow">
+                <h3 class="text-sm text-neon-pink font-bold font-mono">Input</h3>
+                <div class="flex items-center space-x-2 text-xs text-neon-cyan font-mono">
                   <i class="fas fa-code"></i>
                   <span>JSON</span>
                 </div>
+                <button
+                  id="pasteJsonBtn"
+                  class="px-3 py-1.5 text-xs bg-dark-bg border-2 border-neon-cyan text-neon-cyan hover:bg-neon-cyan hover:text-dark-bg transition-colors duration-200 flex items-center space-x-2"
+                >
+                  <i class="fas fa-paste"></i>
+                  <span>Paste</span>
+                </button>
               </div>
             </div>
 
@@ -123,42 +129,43 @@
               ></textarea>
             </div>
           </div>
-
           <!-- Convert Button 1 -->
           <button
             id="jsonToZodBtn"
-            class="w-full bg-dark-panel border-4 border-neon-pink text-neon-pink font-mono py-4 px-6 pixel-btn transition-all duration-200 flex items-center justify-center space-x-3"
+            class="w-full bg-dark-panel border-4 border-neon-pink text-neon-pink font-mono py-4 px-6 pixel-btn transition-all duration-200 flex items-center justify-center space-x-3 xl:ml-[50%]"
           >
             <i class="fas fa-arrow-right"></i>
-            <span>JSON → Zod</span>
+            <span>Convert JSON to Zod Type</span>
           </button>
 
           <!-- Loading State 1 -->
-          <button id="jsonToZodBtnLoading" class="w-full bg-dark-panel border-4 border-neon-pink text-neon-pink font-mono py-4 px-6 flex items-center justify-center space-x-3 hidden" disabled>
+          <button
+            id="jsonToZodBtnLoading"
+            class="w-full bg-dark-panel border-4 border-neon-pink text-neon-pink font-mono py-4 px-6 flex items-center justify-center space-x-3 hidden xl:ml-[50%]"
+            disabled
+          >
             <i class="fas fa-spinner fa-spin"></i>
             <span>Converting...</span>
           </button>
         </div>
 
-        <!-- Panel 2: Zod Code -->
+        <!-- Panel 2: Zod Code with Convert Button 1 above -->
         <div class="space-y-4">
           <div class="bg-dark-panel border-4 border-neon-green pixel-shadow overflow-hidden">
             <div class="bg-dark-bg px-6 py-4 border-b-4 border-neon-green">
               <div class="flex items-center justify-between">
-                <h3 class="text-sm text-neon-green">Zod Type</h3>
-                <div class="flex items-center space-x-3">
-                  <button
-                    id="copyZodBtn"
-                    class="px-3 py-1.5 text-xs bg-dark-bg border-2 border-neon-green text-neon-green hover:bg-neon-green hover:text-dark-bg transition-colors duration-200 flex items-center space-x-2"
-                  >
-                    <i class="fas fa-copy"></i>
-                    <span>Copy</span>
-                  </button>
-                  <div class="text-xs text-neon-yellow flex items-center space-x-1">
-                    <i class="fas fa-code"></i>
-                    <span>Zod</span>
-                  </div>
+                <h3 class="text-sm text-neon-pink font-bold font-mono">Define</h3>
+                <div class="text-xs text-neon-green flex items-center space-x-1 font-mono">
+                  <i class="fas fa-code"></i>
+                  <span>Zod Type</span>
                 </div>
+                <button
+                  id="copyZodBtn"
+                  class="px-3 py-1.5 text-xs bg-dark-bg border-2 border-neon-green text-neon-green hover:bg-neon-green hover:text-dark-bg transition-colors duration-200 flex items-center space-x-2"
+                >
+                  <i class="fas fa-copy"></i>
+                  <span>Copy</span>
+                </button>
               </div>
             </div>
 
@@ -170,47 +177,47 @@
               ></textarea>
             </div>
           </div>
-
           <!-- Convert Button 2 -->
           <button
             id="zodToSchemaBtn"
-            class="w-full bg-dark-panel border-4 border-neon-orange text-neon-orange font-mono py-4 px-6 pixel-btn transition-all duration-200 flex items-center justify-center space-x-3"
+            class="w-full bg-dark-panel border-4 border-neon-orange text-neon-orange font-mono py-4 px-6 pixel-btn transition-all duration-200 flex items-center justify-center space-x-3 xl:ml-[50%]"
           >
             <i class="fas fa-arrow-right"></i>
-            <span>Zod → Schema</span>
+            <span>Convert Zod to JSON Schema</span>
           </button>
-
           <!-- Loading State 2 -->
-          <button id="zodToSchemaBtnLoading" class="w-full bg-dark-panel border-4 border-neon-orange text-neon-orange font-mono py-4 px-6 flex items-center justify-center space-x-3 hidden" disabled>
+          <button
+            id="zodToSchemaBtnLoading"
+            class="w-full bg-dark-panel border-4 border-neon-orange text-neon-orange font-mono py-4 px-6 flex items-center justify-center space-x-3 hidden xl:ml-[50%]"
+            disabled
+          >
             <i class="fas fa-spinner fa-spin"></i>
             <span>Converting...</span>
           </button>
         </div>
 
-        <!-- Panel 3: JSON Schema Output -->
+        <!-- Panel 3: JSON Schema Output with Convert Button 2 above -->
         <div class="space-y-4">
           <div class="bg-dark-panel border-4 border-neon-yellow pixel-shadow overflow-hidden">
             <div class="bg-dark-bg px-6 py-4 border-b-4 border-neon-yellow">
               <div class="flex items-center justify-between">
-                <h3 class="text-sm text-neon-green">JSON Schema</h3>
-                <div class="flex items-center space-x-3">
-                  <button
-                    id="copySchemaBtn"
-                    class="px-3 py-1.5 text-xs bg-dark-bg border-2 border-neon-yellow text-neon-yellow hover:bg-neon-yellow hover:text-dark-bg transition-colors duration-200 flex items-center space-x-2"
-                  >
-                    <i class="fas fa-copy"></i>
-                    <span>Copy</span>
-                  </button>
-                  <div class="text-xs text-neon-yellow flex items-center space-x-1">
-                    <i class="fas fa-file-code"></i>
-                    <span>Schema</span>
-                  </div>
+                <h3 class="text-sm text-neon-orange font-bold font-mono">Output</h3>
+                <div class="text-xs text-neon-yellow flex items-center space-x-1 font-mono">
+                  <i class="fas fa-file-code"></i>
+                  <span>JSON Schema</span>
                 </div>
+                <button
+                  id="copySchemaBtn"
+                  class="px-3 py-1.5 text-xs bg-dark-bg border-2 border-neon-yellow text-neon-yellow hover:bg-neon-yellow hover:text-dark-bg transition-colors duration-200 flex items-center space-x-2"
+                >
+                  <i class="fas fa-copy"></i>
+                  <span>Copy</span>
+                </button>
               </div>
             </div>
 
             <div class="relative">
-              <pre id="jsonSchema" class="w-full h-80 p-6 bg-code-bg text-neon-yellow font-mono text-sm overflow-auto border-0">// JSON Schema will appear here...</pre>
+              <textarea id="jsonSchema" class="w-full h-80 p-6 bg-code-bg text-neon-yellow font-mono text-sm overflow-auto border-0" placeholder="JSON Schema will appear here..."></textarea>
             </div>
           </div>
         </div>
@@ -249,8 +256,8 @@
 
       <!-- Documentation -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- How to Use -->
         <div class="bg-dark-panel border-4 border-neon-cyan pixel-shadow p-6">
+          <!-- How to Use -->
           <h3 class="text-sm text-neon-green font-mono mb-4">How to Use</h3>
           <div class="space-y-6 text-xs font-mono">
             <div>
@@ -271,6 +278,14 @@
                 <li>Optional and required fields</li>
                 <li>Enum values & default values</li>
               </ul>
+            </div>
+            <div>
+              <h4 class="text-neon-yellow mb-2">References</h4>
+              <a href="https://json-schema.org/learn" class="underline hover:text-neon-pink">JSON Schema</a>
+              <span class="text-neon-yellow">|</span>
+              <a href="https://zod.dev" class="underline hover:text-neon-green">Zod</a>
+              <span class="text-neon-yellow">|</span>
+              <a href="https://www.json.org" class="underline hover:text-neon-orange">JSON</a>
             </div>
           </div>
         </div>
@@ -294,9 +309,9 @@
             </div>
             <div>
               <h4 class="text-neon-yellow mb-2">Modes</h4>
-              <ul class="text-neon-cyan space-y-1 list-disc pl-5">
-                <li>"zod" - Zod to JSON Schema</li>
-                <li>"json" - JSON to Zod Schema</li>
+              <ul class="text-neon-cyan space-y-1">
+                <li><span class="text-neon-orange font-mono">"zod"</span> - Zod to JSON Schema</li>
+                <li><span class="text-neon-orange font-mono">"json"</span> - JSON to Zod Schema</li>
               </ul>
             </div>
             <div>
@@ -312,7 +327,9 @@
     </main>
 
     <!-- Footer -->
-    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center text-neon-cyan text-xs font-pixel">Made with 🧠 in Gothenburg</footer>
+    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center text-neon-cyan text-xs font-pixel">
+      <a href="https://github.com/psu" class="text-neon-yellow pixel-shadow font-bold">Made with <span class="text-lg">🧠</span> in Gothenburg</a>
+    </footer>
 
     <script>
       ;(function () {
@@ -468,6 +485,26 @@
           }
         })
 
+        // Paste functionality for JSON input
+        const pasteJsonBtn = document.getElementById('pasteJsonBtn')
+        pasteJsonBtn.addEventListener('click', async () => {
+          try {
+            const text = await navigator.clipboard.readText()
+            jsonInput.value = text
+            const originalText = pasteJsonBtn.innerHTML
+            pasteJsonBtn.innerHTML = '<i class="fas fa-check"></i><span>Pasted!</span>'
+            pasteJsonBtn.classList.add('bg-neon-cyan', 'text-dark-bg')
+
+            setTimeout(() => {
+              pasteJsonBtn.innerHTML = originalText
+              pasteJsonBtn.classList.remove('bg-neon-cyan', 'text-dark-bg')
+            }, 2000)
+          } catch (err) {
+            console.error('Failed to paste: ', err)
+            showMessage('error', 'Failed to paste from clipboard. Check permissions.')
+          }
+        })
+
         // Error dismissal
         dismissError.addEventListener('click', () => {
           errorDisplay.classList.add('hidden')
@@ -477,6 +514,8 @@
         const grayscaleToggle = document.getElementById('grayscaleToggle')
         grayscaleToggle.addEventListener('click', () => {
           document.body.classList.toggle('grayscale')
+          document.body.classList.toggle('brightness-65')
+          document.body.classList.toggle('bg-black')
 
           // Update button text
           const toggleText = grayscaleToggle.querySelector('span')
