@@ -313,8 +313,8 @@
             <div>
               <h4 class="text-neon-yellow mb-2">Modes</h4>
               <ul class="text-neon-cyan space-y-1">
-                <li><span class="text-neon-orange font-mono">"zod"</span> - Zod to JSON Schema</li>
-                <li><span class="text-neon-orange font-mono">"json"</span> - JSON to Zod Schema</li>
+                <li><span class="text-neon-orange font-mono">"json"</span> - JSON to Zod Type</li>
+                <li><span class="text-neon-orange font-mono">"zod"</span> - Zod Type to JSON Schema</li>
               </ul>
             </div>
             <div>
@@ -425,7 +425,7 @@
           try {
             const inputCode = zodCode.value.trim()
             if (!inputCode) {
-              throw new Error('Please enter Zod Schema code to convert')
+              throw new Error('Please enter Zod Type code to convert')
             }
 
             const response = await fetch('/api/convert', {
